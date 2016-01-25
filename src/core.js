@@ -81,23 +81,33 @@
             // items
             ul = $('<ul class="' + settings.classname + '"/>');
 
-        // Run over all the feed items + add them as list items to the
-        // unordered list
-        for ( ; i < length; i++ ) {
-          item = items[i];
-          if ( item.html ) {
-            $('<li class="'+ settings.classname + '-' +
-               item.config.service + '">').data( "name", item.config.service )
-                                          .data( "url", item.url || "#" )
-                                          .data( "time", item.date )
-                                          .append( item.html )
-                                          .appendTo( ul );
+        if (settings.display == "list") {
+          // Run over all the feed items + add them as list items to the
+          // unordered list
+          for (; i < length; i++) {
+            item = items[i];
+            if (item.html) {
+              $('<li class="' + settings.classname + '-' +
+                item.config.service + '">').data("name", item.config.service)
+                .data("url", item.url || "#")
+                .data("time", item.date)
+                .append(item.html)
+                .appendTo(ul);
+            }
           }
-        }
-
         // Change the innerHTML with a list of all the feeditems in
         // chronological order
-        outputElement.html( ul );
+          outputElement.html( ul );
+        }
+
+        // TimeKnots version of the renderer
+        if (settings.display == "timeline") {
+          var data4tkt = inputdata.map(function (a) {
+            a.name = a.html.text();
+            return a
+          });
+          TimeKnots.draw("#" + settings.classname, data4tkt, settings.timeline_settings);
+        }
 
         // Trigger the feedloaded callback, if it is a function
         if ( $.isFunction( settings.feedloaded ) ) {
