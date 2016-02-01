@@ -109,6 +109,30 @@
           TimeKnots.draw("#" + settings.classname, data4tkt, settings.timeline_settings);
         }
 
+        // d3 version of the renderer
+        if (settings.display == "d3" && inputdata.length) {
+          // Create the svg element if it doesn't exist yet
+          var lstrm_svg = d3.select("#"+settings.classname).selectAll("svg").data([1]).enter().append("svg");
+          lstrm_svg.attr("class","lifestream");
+          lstrm_svg.attr("viewBox","0 0 100 100");
+          lstrm_svg.attr("preserveAspectRatio","xMaxYMin");
+          var feed = lstrm_svg.append("g");
+          var getDate = function(lstrm_evt){return new Date(lstrm_evt.date)};
+          var ts = d3.time.scale()
+            .domain([d3.min(inputdata, getDate),d3.max(inputdata, getDate)])
+            .range([0,100]);
+          var ax = d3.svg.axis()
+            .scale(ts)
+            .orient("right")
+            .ticks(d3.time.month);
+          ax(feed);
+          var getPos = function(lstrm_evt){
+            return ts(getDate(lstrm_evt))
+          }
+          feed.selectAll("circle").data(inputdata).enter().append("circle")
+            .attr({r:"4",cx:0,cy:getPos});
+        }
+
         // Trigger the feedloaded callback, if it is a function
         if ( $.isFunction( settings.feedloaded ) ) {
           settings.feedloaded();
