@@ -115,17 +115,23 @@
           if (d3.select("#"+settings.classname).selectAll("svg")[0].length < 1){
             var lstrmEl = d3.select("#"+settings.classname).append("svg");
             lstrmEl.append("g").attr("class","axis")
+            //tooltip
+            var tooltip = d3.select("body")
+              .append("div")
+              .style("position", "absolute")
+              .style("z-index", "10")
+              .attr("class","ttp")
           }
           var lstrmEl = d3.select("#"+settings.classname+" svg");
           lstrmEl.attr("class","lifestream");
           lstrmEl.attr("viewBox","0 -1000 100 1000");
           lstrmEl.attr("preserveAspectRatio","xMaxYMin");
           var tscale = d3.time.scale().range([-0,-1000]);
-          var getDate = function(lstrm_evt){
-            return new Date(lstrm_evt.date)
+          var getDate = function(feed_evt){
+            return new Date(feed_evt.date)
           };
-          var getYPos = function(lstrm_evt){
-            return tscale(getDate(lstrm_evt))
+          var getYPos = function(feed_evt){
+            return tscale(getDate(feed_evt))
           };
           var getFeedName = function(inputdata){
             return inputdata[0].config.service
@@ -136,7 +142,11 @@
             .classed("feed", true)
 
           // Add circles for this data
-          var evtEls = feedGrps.selectAll("circle").data(function(d){return d}).enter().append("circle")
+          var feedEvts = feedGrps.selectAll("g.feed_evt")
+            .data(function(d){return d})
+            .enter().append("g").attr("class","feed_evt")
+
+          feedEvts.append("circle")
             .attr({
               r:"4",
               cx:0
@@ -151,11 +161,23 @@
           var ax = d3.svg.axis()
             .scale(tscale)
             .orient("right")
-            .ticks(d3.time.month);
-
+            .ticks(d3.time.month)
+            .tickFormat(d3.time.format("%Y-%m-%d"));
           d3.select("g.axis").call(ax);
           d3.selectAll('g.feed circle').attr("cy",getYPos);
+          d3.selectAll('g.feed foreignobject').attr("y",getYPos);
 
+          feedEvts.on("mouseover",
+            function(d){
+              d.html.appendTo($(".ttp"));
+              $(".ttp").show();
+            })
+          feedEvts.on("mouseout",
+            function(d){
+              $(".ttp").hide().html('');
+            })
+
+          ;
         };
         // D3 UL version of the renderer
         //var getService=function(inputdata){
