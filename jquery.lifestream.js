@@ -110,52 +110,53 @@
         }
 
         // d3 version of the renderer
-        //if (false) {
         if (settings.display == "d3" && inputdata.length) {
           // Create the svg element, axis etc.
           if (d3.select("#"+settings.classname).selectAll("svg")[0].length < 1){
-            d3.select("#"+settings.classname).append("svg")
+            var lstrmEl = d3.select("#"+settings.classname).append("svg");
+            lstrmEl.append("g").attr("class","axis")
           }
           var lstrmEl = d3.select("#"+settings.classname+" svg");
           lstrmEl.attr("class","lifestream");
-          lstrmEl.attr("viewBox","0 0 100 100");
+          lstrmEl.attr("viewBox","0 -1000 100 1000");
           lstrmEl.attr("preserveAspectRatio","xMaxYMin");
-          var getDate = function(lstrm_evt){return new Date(lstrm_evt.date)};
-          var ts = d3.time.scale()
-            .domain([d3.min(inputdata, getDate),d3.max(inputdata, getDate)])
-            .range([0,100]);
-          var ax = d3.svg.axis()
-            .scale(ts)
-            .orient("right")
-            .ticks(d3.time.month);
-          ax(lstrmEl);
-          var getYPos = function(lstrm_evt){
-            return ts(getDate(lstrm_evt))
+          var tscale = d3.time.scale().range([-0,-1000]);
+          var getDate = function(lstrm_evt){
+            return new Date(lstrm_evt.date)
           };
-
+          var getYPos = function(lstrm_evt){
+            return tscale(getDate(lstrm_evt))
+          };
           var getFeedName = function(inputdata){
             return inputdata[0].config.service
           };
-
-          var findFeedLane = function(){
-            //Translate based on the number of feeds
-            return "translate(" + (d3.selectAll("g.feed")[0].length - 1) * 8 + ",0)"
-          }
           // Add group for this feed
           var feedGrps = lstrmEl.selectAll("g.feed").data([inputdata],getFeedName).enter().append("g")
             .attr("class",getFeedName)
             .classed("feed", true)
-            .attr("transform", findFeedLane)
 
           // Add circles for this data
           var evtEls = feedGrps.selectAll("circle").data(function(d){return d}).enter().append("circle")
             .attr({
               r:"4",
-              cx:0,
-              cy:getYPos,
+              cx:0
             });
-        };
 
+          var findLane = function(d, ind){
+            return "translate("+ (ind * 8 + 8) +", 0)"
+          };
+          // Refresh scale and spread out feeds horizontally
+          tscale.domain(d3.extent(d3.selectAll('g.feed circle').data(), getDate));
+          d3.selectAll("g.feed").attr("transform",findLane);
+          var ax = d3.svg.axis()
+            .scale(tscale)
+            .orient("right")
+            .ticks(d3.time.month);
+
+          d3.select("g.axis").call(ax);
+          d3.selectAll('g.feed circle').attr("cy",getYPos);
+
+        };
         // D3 UL version of the renderer
         //var getService=function(inputdata){
         //    return inputdata[0].config.service;

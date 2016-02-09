@@ -8,20 +8,25 @@
       margin: 0px;
     }
     svg.lifestream {
-      left: 0;
+      right: 0;
       position: fixed;
       height: 100%;
     }
-    path{
-      fill: blue;
+    g.axis path.domain{
+      fill: none;
+      stroke: black;
     }
+    g.axis line{
+      stroke: black;
+    }
+
   </style>
 <body>
   <h1>jQuery Lifestream Example using d3 for display</h1>
   <div id="lifestream">&nbsp;</div>
   <script src="jquery.min.js"></script>
   <script src="jquery.tmpl.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
   <script src="jquery.lifestream.js" type="text/javascript" charset="utf-8"></script>
   <script>
     (function(){
@@ -32,12 +37,16 @@
           user: 'foobarbecue'
         },
         {
-          service: 'twitter',
-          user:'trailbyfire'
+          service: 'stackoverflow',
+          user:'616730'
         },
         {
           service: 'zotero',
           user:'aarongc'
+        },
+        {
+          service: 'twitter',
+          user:'trailbyfire'
         }
       ];
 
