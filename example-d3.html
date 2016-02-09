@@ -3,14 +3,17 @@
 <head>
   <link href="css/lifestream.css" rel="stylesheet" type="text/css">
   <style type="text/css">
+    * {
+      border: 0px;
+      margin: 0px;
+    }
     svg.lifestream {
-      right: 0;
+      left: 0;
       position: fixed;
       height: 100%;
-      width: 100px;
     }
-    line{
-      stroke: blue;
+    path{
+      fill: blue;
     }
   </style>
 <body>
@@ -29,15 +32,19 @@
           user: 'foobarbecue'
         },
         {
-          service: 'facebook',
-          user: 'foobarbecue'
+          service: 'twitter',
+          user:'trailbyfire'
         },
+        {
+          service: 'zotero',
+          user:'aarongc'
+        }
       ];
 
       $("#lifestream").lifestream({
         list: stream_svcs,
         display: 'd3',
-        timeline_settings: {horizontalLayout: false}
+        limit: 400
       });
     })();
   </script>

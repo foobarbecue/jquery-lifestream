@@ -110,13 +110,16 @@
         }
 
         // d3 version of the renderer
+        //if (false) {
         if (settings.display == "d3" && inputdata.length) {
-          // Create the svg element if it doesn't exist yet
-          var lstrm_svg = d3.select("#"+settings.classname).selectAll("svg").data([1]).enter().append("svg");
-          lstrm_svg.attr("class","lifestream");
-          lstrm_svg.attr("viewBox","0 0 100 100");
-          lstrm_svg.attr("preserveAspectRatio","xMaxYMin");
-          var feed = lstrm_svg.append("g");
+          // Create the svg element, axis etc.
+          if (d3.select("#"+settings.classname).selectAll("svg")[0].length < 1){
+            d3.select("#"+settings.classname).append("svg")
+          }
+          var lstrmEl = d3.select("#"+settings.classname+" svg");
+          lstrmEl.attr("class","lifestream");
+          lstrmEl.attr("viewBox","0 0 100 100");
+          lstrmEl.attr("preserveAspectRatio","xMaxYMin");
           var getDate = function(lstrm_evt){return new Date(lstrm_evt.date)};
           var ts = d3.time.scale()
             .domain([d3.min(inputdata, getDate),d3.max(inputdata, getDate)])
@@ -125,13 +128,46 @@
             .scale(ts)
             .orient("right")
             .ticks(d3.time.month);
-          ax(feed);
-          var getPos = function(lstrm_evt){
+          ax(lstrmEl);
+          var getYPos = function(lstrm_evt){
             return ts(getDate(lstrm_evt))
+          };
+
+          var getFeedName = function(inputdata){
+            return inputdata[0].config.service
+          };
+
+          var findFeedLane = function(){
+            //Translate based on the number of feeds
+            return "translate(" + (d3.selectAll("g.feed")[0].length - 1) * 8 + ",0)"
           }
-          feed.selectAll("circle").data(inputdata).enter().append("circle")
-            .attr({r:"4",cx:0,cy:getPos});
-        }
+          // Add group for this feed
+          var feedGrps = lstrmEl.selectAll("g.feed").data([inputdata],getFeedName).enter().append("g")
+            .attr("class",getFeedName)
+            .classed("feed", true)
+            .attr("transform", findFeedLane)
+
+          // Add circles for this data
+          var evtEls = feedGrps.selectAll("circle").data(function(d){return d}).enter().append("circle")
+            .attr({
+              r:"4",
+              cx:0,
+              cy:getYPos,
+            });
+        };
+
+        // D3 UL version of the renderer
+        //var getService=function(inputdata){
+        //    return inputdata[0].config.service;
+        //};
+        //if (settings.display == "d3" && inputdata.length) {
+        //  // Add the new data, with a key function that checks the service (github, twitter, whatever)
+        //  var bdy = d3.select("body")
+        //  bdy.selectAll("ul").data([inputdata],getService).enter().append("ul").attr("class",getService);
+        //  var lis = bdy.selectAll("ul").selectAll("li").data(function(d){return d}).enter().append("li");
+        //  bdy.selectAll("li").each(function(d){console.log(d.html.appendTo(this))});
+        //  console.log("fump")
+        //}
 
         // Trigger the feedloaded callback, if it is a function
         if ( $.isFunction( settings.feedloaded ) ) {
