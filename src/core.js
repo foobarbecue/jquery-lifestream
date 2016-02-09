@@ -126,7 +126,7 @@
           lstrmEl.attr("class","lifestream");
           lstrmEl.attr("viewBox","0 -1000 100 1000");
           lstrmEl.attr("preserveAspectRatio","xMaxYMin");
-          var tscale = d3.time.scale().range([-0,-1000]);
+          var tscale = d3.time.scale().range([-150,-1000]);
           var getDate = function(feed_evt){
             return new Date(feed_evt.date)
           };
@@ -137,23 +137,30 @@
             return inputdata[0].config.service
           };
           // Add group for this feed
-          var feedGrps = lstrmEl.selectAll("g.feed").data([inputdata],getFeedName).enter().append("g")
+          var feedGrp = lstrmEl.selectAll("g.feed").data([inputdata],getFeedName).enter().append("g")
             .attr("class",getFeedName)
             .classed("feed", true)
 
+          // Add label for this feed group
+          feedGrp.append("text")
+            .text(function(d){return d[0].config.service})
+            .attr("transform","translate(0,-145)rotate(-90)")
+            .attr("text-anchor","end")
+            .style("font-variant","small-caps");
+
           // Add circles for this data
-          var feedEvts = feedGrps.selectAll("g.feed_evt")
+          var feedEvts = feedGrp.selectAll("g.feed_evt")
             .data(function(d){return d})
             .enter().append("g").attr("class","feed_evt")
 
           feedEvts.append("circle")
             .attr({
-              r:"4",
+              r:"3",
               cx:0
             });
 
           var findLane = function(d, ind){
-            return "translate("+ (ind * 8 + 8) +", 0)"
+            return "translate("+ (ind * 12 + 12) +", 0)"
           };
           // Refresh scale and spread out feeds horizontally
           tscale.domain(d3.extent(d3.selectAll('g.feed circle').data(), getDate));
