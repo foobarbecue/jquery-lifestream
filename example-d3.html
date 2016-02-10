@@ -20,6 +20,13 @@
     g.axis line{
       stroke: black;
     }
+    .axis{
+      display: none;
+    }
+    div.ttp{
+      border: thin black solid;
+      background: lightgrey;
+    }
 
   </style>
 <body>
@@ -50,10 +57,13 @@
           user:'trailbyfire'
         },
         {
+          service: 'facebook',
+          user:'foobarbecue'
+        },
+        {
           service: 'youtube',
           user:'foobarbecue'
         }
-
       ];
 
       $("#lifestream").lifestream({

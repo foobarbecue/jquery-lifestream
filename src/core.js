@@ -116,7 +116,7 @@
             var lstrmEl = d3.select("#"+settings.classname).append("svg");
             lstrmEl.append("g").attr("class","axis")
             //tooltip
-            var tooltip = d3.select("body")
+            d3.select("body")
               .append("div")
               .style("position", "absolute")
               .style("z-index", "10")
@@ -126,6 +126,7 @@
           lstrmEl.attr("class","lifestream");
           lstrmEl.attr("viewBox","0 -1000 100 1000");
           lstrmEl.attr("preserveAspectRatio","xMaxYMin");
+          var tooltipEl = d3.select("div.ttp")
           var tscale = d3.time.scale().range([-150,-1000]);
           var getDate = function(feed_evt){
             return new Date(feed_evt.date)
@@ -146,6 +147,7 @@
             .text(function(d){return d[0].config.service})
             .attr("transform","translate(0,-145)rotate(-90)")
             .attr("text-anchor","end")
+            .attr("class","axis")
             .style("font-variant","small-caps");
 
           // Add circles for this data
@@ -155,7 +157,7 @@
 
           feedEvts.append("circle")
             .attr({
-              r:"3",
+              r:"4",
               cx:0
             });
 
@@ -174,30 +176,35 @@
           d3.selectAll('g.feed circle').attr("cy",getYPos);
           d3.selectAll('g.feed foreignobject').attr("y",getYPos);
 
-          feedEvts.on("mouseover",
+          feedEvts.on("mouseenter",
             function(d){
               d.html.appendTo($(".ttp"));
+              $(".axis").show();
               $(".ttp").show();
+              d3.select(".ttp")
+                .style("top",d3.event.y + "px")
+                .style("right",window.innerWidth - d3.event.x + "px");
             })
-          feedEvts.on("mouseout",
-            function(d){
-              $(".ttp").hide().html('');
-            })
+          tooltipEl.on("mouseenter", function(){
+            tooltipEl.transition().duration(0);
+            tooltipEl.style('display','block')
+          })
+            .on("mouseleave", function(){
+              tooltipEl.style('display','none')
+          });
+          // Show the axis when mouse goes over the lifestream
+          lstrmEl.on("mouseenter",
+            function() {
+              $(".axis").fadeIn()
+            });
+          lstrmEl.on("mouseleave",
+            function() {
+              $(".axis").hide();
+              tooltipEl.transition().delay(500).style('display','none');
 
-          ;
+            });
+
         };
-        // D3 UL version of the renderer
-        //var getService=function(inputdata){
-        //    return inputdata[0].config.service;
-        //};
-        //if (settings.display == "d3" && inputdata.length) {
-        //  // Add the new data, with a key function that checks the service (github, twitter, whatever)
-        //  var bdy = d3.select("body")
-        //  bdy.selectAll("ul").data([inputdata],getService).enter().append("ul").attr("class",getService);
-        //  var lis = bdy.selectAll("ul").selectAll("li").data(function(d){return d}).enter().append("li");
-        //  bdy.selectAll("li").each(function(d){console.log(d.html.appendTo(this))});
-        //  console.log("fump")
-        //}
 
         // Trigger the feedloaded callback, if it is a function
         if ( $.isFunction( settings.feedloaded ) ) {
