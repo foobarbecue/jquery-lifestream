@@ -100,15 +100,6 @@
           outputElement.html( ul );
         }
 
-        // TimeKnots version of the renderer
-        if (settings.display == "timeline") {
-          var data4tkt = inputdata.map(function (a) {
-            a.name = a.html.text();
-            return a
-          });
-          TimeKnots.draw("#" + settings.classname, data4tkt, settings.timeline_settings);
-        }
-
         // d3 version of the renderer
         if (settings.display == "d3" && inputdata.length) {
           // Create the svg element, axis etc.
