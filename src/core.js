@@ -169,6 +169,7 @@
 
           feedEvts.on("mouseenter",
             function(d){
+              tooltipEl.html("");
               d.html.appendTo($(".ttp"));
               $(".axis").show();
               $(".ttp").show();
@@ -181,7 +182,8 @@
             tooltipEl.style('display','block')
           })
             .on("mouseleave", function(){
-              tooltipEl.style('display','none')
+              tooltipEl.style('display','none');
+              tooltipEl.html('');
           });
           // Show the axis when mouse goes over the lifestream
           lstrmEl.on("mouseenter",
@@ -192,7 +194,6 @@
             function() {
               $(".axis").hide();
               tooltipEl.transition().delay(500).style('display','none');
-
             });
 
         };
